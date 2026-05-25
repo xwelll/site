@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Тренажер экзамена</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;800&family=IBM+Plex+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <p class="kicker">Подготовка к ГИА</p>
+      <h1>Единый тренажер по билетам и всем вопросам</h1>
+      <p class="subtitle">
+        Два режима: все вопросы в перемешку с учетом блоков и разделов, либо билет из 15 вопросов (1 вопрос на каждый блок+раздел).
+      </p>
+    </section>
+
+    <section class="tabs">
+      <button id="tab-all" class="tab active">Все вопросы</button>
+      <button id="tab-ticket" class="tab">Билет 15</button>
+      <button id="new-session-btn" class="btn solid">Новая сессия</button>
+      <button id="shuffle-all-btn" class="btn ghost">Перемешать (Все вопросы)</button>
+      <button id="shuffle-ticket-btn" class="btn ghost">Перемешать билет</button>
+      <button id="wrong-only-btn" class="btn ghost">Только ошибки</button>
+    </section>
+
+    <section class="layout">
+      <article class="card question-card">
+        <div class="question-top">
+          <span id="mode-badge" class="chip"></span>
+          <span id="progress-badge" class="chip"></span>
+          <span id="session-score-badge" class="chip chip-good"></span>
+        </div>
+
+        <div class="question-meta">
+          <span id="block-tag" class="tag"></span>
+          <span id="section-tag" class="tag"></span>
+          <span id="type-tag" class="tag"></span>
+        </div>
+
+        <h2 id="question-title">Загрузка...</h2>
+        <div id="all-search-box" class="all-search-box hide">
+          <input id="all-search-input" type="search" placeholder="Поиск: ID, текст вопроса, вариант или ответ">
+          <button id="all-search-clear" class="btn ghost small">Очистить</button>
+          <span id="all-search-count" class="hint"></span>
+        </div>
+        <div id="question-body" class="question-body"></div>
+
+        <div class="actions">
+          <button id="check-btn" class="btn solid">Проверить</button>
+          <button id="show-answer-btn" class="btn ghost">Показать ответ</button>
+          <button id="next-btn" class="btn ghost">Следующий</button>
+        </div>
+
+        <div id="feedback" class="feedback"></div>
+        <details class="answer-box">
+          <summary>Верный ответ</summary>
+          <p id="correct-answer"></p>
+        </details>
+      </article>
+
+      <aside class="card side">
+        <h3>Сводная статистика</h3>
+        <div class="stats-grid">
+          <div class="stat">
+            <p>Попыток</p>
+            <b id="stat-attempts">0</b>
+          </div>
+          <div class="stat">
+            <p>Правильных</p>
+            <b id="stat-correct">0</b>
+          </div>
+          <div class="stat">
+            <p>Точность</p>
+            <b id="stat-accuracy">0%</b>
+          </div>
+          <div class="stat">
+            <p>Прогресс</p>
+            <b id="stat-covered">0 / 0</b>
+          </div>
+          <div class="stat">
+            <p>Серия</p>
+            <b id="stat-streak">0</b>
+          </div>
+          <div class="stat">
+            <p>Лучшая серия</p>
+            <b id="stat-best-streak">0</b>
+          </div>
+        </div>
+        <button id="reset-stats-btn" class="btn danger">Сбросить статистику</button>
+      </aside>
+    </section>
+
+    <section class="card stats-detail-card">
+      <h3>Сводная таблица по блокам и разделам</h3>
+      <div class="table-wrap">
+        <table id="stats-table">
+          <colgroup>
+            <col class="col-block">
+            <col class="col-section">
+            <col class="col-num">
+            <col class="col-num">
+            <col class="col-status">
+            <col class="col-percent">
+            <col class="col-percent">
+            <col class="col-coverage">
+          </colgroup>
+          <thead>
+            <tr>
+              <th>Блок</th>
+              <th>Раздел</th>
+              <th>Верно</th>
+              <th>Неверно</th>
+              <th>Верно отвечено</th>
+              <th>Точность %</th>
+              <th>Освоение %</th>
+              <th>Покрытие</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card">
+      <h3>Слабые места</h3>
+      <ul id="weak-list" class="weak-list"></ul>
+    </section>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
