@@ -99,6 +99,7 @@ def extract() -> dict:
                 questions.append(
                     {
                         "id": qid,
+                        "sourceNumber": normalize_space(cells[0]) or qid,
                         "block": discipline,
                         "section": section_name,
                         "type": qtype,

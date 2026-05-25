@@ -3,7 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0f6bff">
   <title>Тренажер экзамена</title>
+  <link rel="manifest" href="manifest.webmanifest">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;800&family=IBM+Plex+Sans:wght@400;500;700&display=swap" rel="stylesheet">
@@ -19,13 +21,17 @@
       </p>
     </section>
 
-    <section class="tabs">
-      <button id="tab-all" class="tab active">Все вопросы</button>
-      <button id="tab-ticket" class="tab">Билет 15</button>
-      <button id="new-session-btn" class="btn solid">Новая сессия</button>
-      <button id="shuffle-all-btn" class="btn ghost">Перемешать (Все вопросы)</button>
-      <button id="shuffle-ticket-btn" class="btn ghost">Перемешать билет</button>
-      <button id="wrong-only-btn" class="btn ghost">Только ошибки</button>
+    <section class="topbar">
+      <div class="tabs" aria-label="Режим тренировки">
+        <button id="tab-all" class="tab active">Все вопросы</button>
+        <button id="tab-ticket" class="tab">Билет 15</button>
+      </div>
+      <div class="command-bar">
+        <button id="new-session-btn" class="btn solid">Новая сессия</button>
+        <button id="shuffle-all-btn" class="btn ghost">Перемешать вопросы</button>
+        <button id="shuffle-ticket-btn" class="btn ghost">Перемешать билет</button>
+        <button id="wrong-only-btn" class="btn ghost">Только ошибки</button>
+      </div>
     </section>
 
     <section class="layout">
@@ -44,9 +50,31 @@
 
         <h2 id="question-title">Загрузка...</h2>
         <div id="all-search-box" class="all-search-box hide">
-          <input id="all-search-input" type="search" placeholder="Поиск: ID, текст вопроса, вариант или ответ">
+          <label class="control search-control">
+            <span>Поиск</span>
+            <input id="all-search-input" type="search" placeholder="ID, вопрос, вариант или ответ">
+          </label>
+          <label class="control">
+            <span>Блок</span>
+            <select id="filter-block"></select>
+          </label>
+          <label class="control">
+            <span>Раздел</span>
+            <select id="filter-section"></select>
+          </label>
+          <label class="control">
+            <span>Тип</span>
+            <select id="filter-type"></select>
+          </label>
+          <label class="control check-control">
+            <span>Фильтр</span>
+            <label class="toggle-line">
+              <input id="filter-unanswered" type="checkbox">
+              <span>Нерешённые</span>
+            </label>
+          </label>
           <button id="all-search-clear" class="btn ghost small">Очистить</button>
-          <span id="all-search-count" class="hint"></span>
+          <span id="all-search-count" class="hint search-count"></span>
         </div>
         <div id="question-body" class="question-body"></div>
 
@@ -92,6 +120,10 @@
           </div>
         </div>
         <button id="reset-stats-btn" class="btn danger">Сбросить статистику</button>
+        <div class="block-progress">
+          <h4>Прогресс по блокам</h4>
+          <div id="block-progress-list"></div>
+        </div>
       </aside>
     </section>
 

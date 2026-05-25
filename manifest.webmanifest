@@ -1,0 +1,12 @@
+{
+  "name": "Тренажер экзамена",
+  "short_name": "Экзамен",
+  "description": "Тренажер для подготовки к экзамену: все вопросы, билеты и статистика.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f7f5ef",
+  "theme_color": "#0f6bff",
+  "lang": "ru",
+  "icons": []
+}

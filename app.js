@@ -14,6 +14,12 @@ const state = {
   searchQuery: "",
   searchIndex: {},
   wrongOnly: false,
+  filters: {
+    block: "",
+    section: "",
+    type: "",
+    unanswered: false,
+  },
 };
 
 const el = {
@@ -37,6 +43,10 @@ const el = {
   allSearchInput: document.getElementById("all-search-input"),
   allSearchClear: document.getElementById("all-search-clear"),
   allSearchCount: document.getElementById("all-search-count"),
+  filterBlock: document.getElementById("filter-block"),
+  filterSection: document.getElementById("filter-section"),
+  filterType: document.getElementById("filter-type"),
+  filterUnanswered: document.getElementById("filter-unanswered"),
   questionBody: document.getElementById("question-body"),
   correctAnswer: document.getElementById("correct-answer"),
   checkBtn: document.getElementById("check-btn"),
@@ -50,17 +60,20 @@ const el = {
   statStreak: document.getElementById("stat-streak"),
   statBestStreak: document.getElementById("stat-best-streak"),
   statsTableBody: document.querySelector("#stats-table tbody"),
+  blockProgressList: document.getElementById("block-progress-list"),
   weakList: document.getElementById("weak-list"),
 };
 
 init();
 
 async function init() {
+  registerServiceWorker();
   const response = await fetch("./data/questions.json");
   const payload = await response.json();
   state.questions = payload.questions || [];
   buildOrders(state.questions);
   buildSearchIndex(state.questions);
+  fillFilterControls();
 
   bindEvents();
   startSession("all");
@@ -93,6 +106,7 @@ function bindEvents() {
   });
   el.nextBtn.addEventListener("click", nextTicketQuestion);
   el.questionBody.addEventListener("click", handleAllModeClick);
+  el.questionBody.addEventListener("change", handleMatchingSelectChange);
 
   el.resetStatsBtn.addEventListener("click", () => {
     state.stats = createEmptyStats();
@@ -107,8 +121,30 @@ function bindEvents() {
   el.allSearchClear.addEventListener("click", () => {
     state.searchQuery = "";
     el.allSearchInput.value = "";
+    state.filters = { block: "", section: "", type: "", unanswered: false };
+    syncFilterControls();
     applyAllSearch();
   });
+  el.filterBlock.addEventListener("change", () => {
+    state.filters.block = el.filterBlock.value;
+    state.filters.section = "";
+    fillSectionFilter();
+    applyAllSearch();
+  });
+  el.filterSection.addEventListener("change", () => {
+    state.filters.section = el.filterSection.value;
+    applyAllSearch();
+  });
+  el.filterType.addEventListener("change", () => {
+    state.filters.type = el.filterType.value;
+    applyAllSearch();
+  });
+  el.filterUnanswered.addEventListener("change", () => {
+    state.filters.unanswered = el.filterUnanswered.checked;
+    applyAllSearch();
+  });
+
+  el.weakList.addEventListener("click", handleWeakListClick);
 }
 
 function buildOrders(questions) {
@@ -132,6 +168,7 @@ function buildSearchIndex(questions) {
   for (const q of questions) {
     const blob = [
       q.id,
+      q.sourceNumber,
       q.block,
       q.section,
       q.question,
@@ -141,6 +178,38 @@ function buildSearchIndex(questions) {
     index[q.id] = normalizeSearchText(blob);
   }
   state.searchIndex = index;
+}
+
+function fillFilterControls() {
+  el.filterBlock.innerHTML = `<option value="">Все блоки</option>${state.blockOrder
+    .map((block) => `<option value="${escapeHtml(block)}">${escapeHtml(block)}</option>`)
+    .join("")}`;
+  fillSectionFilter();
+  el.filterType.innerHTML = [
+    ["", "Все типы"],
+    ["single_choice", "Закрытые"],
+    ["matching_or_order", "Соответствие/последовательность"],
+    ["open", "Открытые"],
+  ]
+    .map(([value, label]) => `<option value="${value}">${label}</option>`)
+    .join("");
+}
+
+function fillSectionFilter() {
+  const sections = state.filters.block
+    ? state.sectionOrderByBlock[state.filters.block] || []
+    : [...new Set(state.blockOrder.flatMap((block) => state.sectionOrderByBlock[block] || []))];
+  el.filterSection.innerHTML = `<option value="">Все разделы</option>${sections
+    .map((section) => `<option value="${escapeHtml(section)}">${escapeHtml(section)}</option>`)
+    .join("")}`;
+}
+
+function syncFilterControls() {
+  el.filterBlock.value = state.filters.block;
+  fillSectionFilter();
+  el.filterSection.value = state.filters.section;
+  el.filterType.value = state.filters.type;
+  el.filterUnanswered.checked = state.filters.unanswered;
 }
 
 function startSession(mode) {
@@ -219,7 +288,12 @@ function renderAllMode() {
     })
     .join("");
 
-  el.questionBody.innerHTML = `<div class="all-groups">${html}</div>`;
+  el.questionBody.innerHTML = `
+    <div class="all-groups">${html}</div>
+    <div id="all-empty-state" class="empty-state hide">
+      Ничего не найдено. Попробуйте убрать фильтр, изменить запрос или нажать "Очистить".
+    </div>
+  `;
   applyAllSearch();
 }
 
@@ -244,11 +318,11 @@ function groupQuestionsShuffledBySection(questions) {
 }
 
 function renderAllQuestion(q) {
-  const body = q.type === "single_choice" ? renderAllChoiceInput(q) : renderAllTextInput(q);
+  const body = renderQuestionInput(q, "all");
   return `
-    <article class="all-question" id="all-q-${q.id}" data-qid="${q.id}">
+    <article class="all-question" id="all-q-${q.id}" data-qid="${q.id}" data-block="${escapeHtml(q.block)}" data-section="${escapeHtml(q.section)}" data-type="${q.type}">
       <div class="all-q-head">
-        <span class="chip">ID ${q.id}</span>
+        <span class="chip question-number">Вопрос №${escapeHtml(questionNumber(q))}</span>
         <span class="chip">${escapeHtml(questionTypeLabel(q.type))}</span>
       </div>
       <p class="all-q-title">${escapeHtml(q.question)}</p>
@@ -291,14 +365,200 @@ function renderAllChoiceInput(q) {
   `;
 }
 
+function renderQuestionInput(q, scope) {
+  if (q.type === "single_choice") return renderChoiceInput(q, scope);
+  if (q.type === "matching_or_order") return renderMatchingInput(q, scope);
+  return renderTextInput(q, scope);
+}
+
+function renderChoiceInput(q, scope) {
+  const multi = extractLetters(q.correctAnswer).length > 1;
+  const type = multi ? "checkbox" : "radio";
+  const options = q.options || [];
+
+  return `
+    <div class="question-body">
+      ${options
+        .map((raw, idx) => {
+          const option = splitOption(raw, idx);
+          const name = multi ? `${scope}_answer_${q.id}_${idx}` : `${scope}_answer_${q.id}`;
+          return `
+            <div class="option">
+              <label>
+                <input type="${type}" name="${name}" value="${escapeHtml(option.label)}">
+                <span><b>${escapeHtml(option.label)})</b> ${escapeHtml(option.text)}</span>
+              </label>
+            </div>
+          `;
+        })
+        .join("")}
+    </div>
+  `;
+}
+
 function renderAllTextInput(q) {
-  const hint = q.type === "matching_or_order"
-    ? "Формат: 1-А, 2-Б или Г, Б, А."
-    : "Свободный ответ.";
+  return renderTextInput(q, "all");
+}
+
+function renderTextInput(q, scope) {
+  const hint = "Свободный ответ.";
   return `
     <p class="hint">${escapeHtml(hint)}</p>
-    <textarea id="all-text-${q.id}" placeholder="Ваш ответ"></textarea>
+    <textarea id="${scope}-text-${q.id}" placeholder="Ваш ответ"></textarea>
   `;
+}
+
+function renderMatchingInput(q, scope) {
+  const model = buildMatchingModel(q);
+  if (model.kind === "matching" && model.left.length && model.right.length) {
+    return `
+      <div class="match-layout">
+        <div class="match-bank">
+          ${model.right.map((item) => `
+            <div class="match-bank-item">
+              <b>${escapeHtml(item.label)})</b>
+              <span>${escapeHtml(item.text)}</span>
+            </div>
+          `).join("")}
+        </div>
+        <div class="match-rows">
+          ${model.left.map((item) => `
+            <label class="match-row">
+              <span class="match-left"><b>${escapeHtml(item.label)}.</b> ${escapeHtml(item.text)}</span>
+              <select data-match-select="${scope}" data-match-left="${escapeHtml(item.label)}">
+                <option value="">Выберите</option>
+                ${model.right.map((right) => `<option value="${escapeHtml(right.label)}">${escapeHtml(right.label)}</option>`).join("")}
+              </select>
+            </label>
+          `).join("")}
+        </div>
+      </div>
+    `;
+  }
+
+  const sequence = model.sequence.length ? model.sequence : model.right;
+  const positions = Math.max(extractLetters(q.correctAnswer).length, sequence.length);
+  if (sequence.length && positions) {
+    return `
+      <div class="match-layout">
+        <div class="match-bank">
+          ${sequence.map((item) => `
+            <div class="match-bank-item">
+              <b>${escapeHtml(item.label)})</b>
+              <span>${escapeHtml(item.text)}</span>
+            </div>
+          `).join("")}
+        </div>
+        <div class="match-rows">
+          ${Array.from({ length: positions }, (_, index) => `
+            <label class="match-row compact">
+              <span class="match-left"><b>${index + 1} место</b></span>
+              <select data-sequence-select="${scope}">
+                <option value="">Выберите</option>
+                ${sequence.map((item) => `<option value="${escapeHtml(item.label)}">${escapeHtml(item.label)}</option>`).join("")}
+              </select>
+            </label>
+          `).join("")}
+        </div>
+      </div>
+    `;
+  }
+
+  return renderTextInput(q, scope);
+}
+
+function buildMatchingModel(q) {
+  const model = {
+    kind: "sequence",
+    left: [],
+    right: [],
+    sequence: [],
+  };
+
+  for (const raw of q.options || []) {
+    const numbered = parseNumberedOption(raw);
+    if (numbered) {
+      model.left.push(numbered);
+      continue;
+    }
+
+    const lettered = parseLetteredOption(raw);
+    if (lettered) {
+      model.right.push(lettered);
+    }
+  }
+
+  if (model.left.length && model.right.length) {
+    model.kind = "matching";
+    return model;
+  }
+
+  model.sequence = model.right.length
+    ? model.right
+    : (q.options || []).map((raw, index) => splitOption(raw, index));
+  return model;
+}
+
+function parseNumberedOption(raw) {
+  const text = String(raw || "").trim();
+  const match = text.match(/^(\d+)\s*[\).]\s*(.*)$/u);
+  if (!match) return null;
+  return { label: match[1], text: cleanOptionText(match[2]) };
+}
+
+function parseLetteredOption(raw) {
+  const text = String(raw || "").trim();
+  const match = text.match(/^([A-Za-zА-Яа-яЁё])\s*[\).]\s*(.*)$/u);
+  if (!match) return null;
+  return {
+    label: normalizeLetter(normalizeLetters(match[1])),
+    text: cleanOptionText(match[2]),
+  };
+}
+
+function cleanOptionText(value) {
+  return String(value || "").replace(/[;,.]\s*$/u, "").trim();
+}
+
+function getMatchingAnswer(container, scope) {
+  const pairSelects = [...container.querySelectorAll(`select[data-match-select="${scope}"]`)];
+  if (pairSelects.length) {
+    const values = pairSelects.map((select) => select.value);
+    if (values.some((value) => !value)) return "";
+    if (new Set(values).size !== values.length) return "";
+    return pairSelects.map((select) => `${select.dataset.matchLeft}-${select.value}`).join(", ");
+  }
+
+  const sequenceSelects = [...container.querySelectorAll(`select[data-sequence-select="${scope}"]`)];
+  if (sequenceSelects.length) {
+    const values = sequenceSelects.map((select) => select.value);
+    if (values.some((value) => !value)) return "";
+    if (new Set(values).size !== values.length) return "";
+    return values.join(", ");
+  }
+
+  return "";
+}
+
+function handleMatchingSelectChange(event) {
+  const select = event.target.closest("select[data-match-select], select[data-sequence-select]");
+  if (!select) return;
+
+  const rows = select.closest(".match-rows");
+  if (!rows) return;
+
+  const selector = select.matches("[data-match-select]")
+    ? "select[data-match-select]"
+    : "select[data-sequence-select]";
+  const selects = [...rows.querySelectorAll(selector)];
+  const selected = new Set(selects.map((item) => item.value).filter(Boolean));
+
+  for (const item of selects) {
+    for (const option of item.options) {
+      if (!option.value) continue;
+      option.disabled = item.value !== option.value && selected.has(option.value);
+    }
+  }
 }
 
 function handleAllModeClick(event) {
@@ -330,7 +590,7 @@ function submitAllQuestion(q) {
   }
 
   const ok = evaluateAnswer(q, user.value);
-  state.submittedInSession.add(q.id);
+  if (ok) state.submittedInSession.add(q.id);
   state.sessionAttempts += 1;
   if (ok) state.sessionCorrect += 1;
 
@@ -338,7 +598,9 @@ function submitAllQuestion(q) {
   saveStats();
   renderSessionBadges();
   renderStats();
-  setAllFeedback(q.id, ok ? "Верно." : "Неверно.", ok ? "ok" : "bad");
+  setAllFeedback(q.id, ok ? "Верно." : "Неверно. Можно исправить и проверить этот вопрос еще раз.", ok ? "ok" : "bad");
+  markAllQuestionStatus(q.id, ok);
+  applyAllSearch();
 }
 
 function getAllModeAnswer(q) {
@@ -352,6 +614,12 @@ function getAllModeAnswer(q) {
     return { valid: true, value: selected.join(", ") };
   }
 
+  if (q.type === "matching_or_order") {
+    const value = getMatchingAnswer(scope, "all");
+    if (!value) return { valid: false, message: "Выберите варианты соответствия." };
+    return { valid: true, value };
+  }
+
   const text = (document.getElementById(`all-text-${q.id}`)?.value || "").trim();
   if (!text) return { valid: false, message: "Введите ответ." };
   return { valid: true, value: text };
@@ -362,6 +630,13 @@ function setAllFeedback(id, message, tone) {
   if (!row) return;
   row.textContent = message;
   row.className = `all-q-feedback ${tone}`;
+}
+
+function markAllQuestionStatus(id, ok) {
+  const card = document.getElementById(`all-q-${id}`);
+  if (!card) return;
+  card.classList.remove("is-correct", "is-wrong");
+  card.classList.add(ok ? "is-correct" : "is-wrong");
 }
 
 function renderTicketMode() {
@@ -396,37 +671,11 @@ function renderTicketQuestion() {
   el.blockTag.textContent = q.block;
   el.sectionTag.textContent = q.section;
   el.typeTag.textContent = questionTypeLabel(q.type);
-  el.questionTitle.textContent = q.question;
+  el.questionTitle.textContent = `Вопрос №${questionNumber(q)}. ${q.question}`;
   el.correctAnswer.textContent = q.correctAnswer;
   setFeedback("", "");
 
-  if (q.type === "single_choice") {
-    const multi = extractLetters(q.correctAnswer).length > 1;
-    const type = multi ? "checkbox" : "radio";
-    const options = q.options || [];
-    el.questionBody.innerHTML = options
-      .map((raw, idx) => {
-        const option = splitOption(raw, idx);
-        const name = multi ? `ticket_answer_${q.id}_${idx}` : `ticket_answer_${q.id}`;
-        return `
-          <div class="option">
-            <label>
-              <input type="${type}" name="${name}" value="${escapeHtml(option.label)}">
-              <span><b>${escapeHtml(option.label)})</b> ${escapeHtml(option.text)}</span>
-            </label>
-          </div>
-        `;
-      })
-      .join("");
-  } else {
-    const hint = q.type === "matching_or_order"
-      ? "Введите в формате 1-А, 2-Б или Г, Б, А."
-      : "Введите ответ в свободной форме.";
-    el.questionBody.innerHTML = `
-      <p class="hint">${escapeHtml(hint)}</p>
-      <textarea id="ticket-text-answer" placeholder="Ваш ответ"></textarea>
-    `;
-  }
+  el.questionBody.innerHTML = renderQuestionInput(q, "ticket");
 }
 
 function submitTicketAnswer() {
@@ -465,7 +714,13 @@ function getTicketAnswer(q) {
     return { valid: true, value: selected.join(", ") };
   }
 
-  const text = (document.getElementById("ticket-text-answer")?.value || "").trim();
+  if (q.type === "matching_or_order") {
+    const value = getMatchingAnswer(el.questionBody, "ticket");
+    if (!value) return { valid: false, message: "Выберите варианты соответствия." };
+    return { valid: true, value };
+  }
+
+  const text = (document.getElementById(`ticket-text-${q.id}`)?.value || "").trim();
   if (!text) return { valid: false, message: "Введите ответ." };
   return { valid: true, value: text };
 }
@@ -495,10 +750,15 @@ function applyAllSearch() {
     const qid = Number(card.dataset.qid || 0);
     const searchable = state.searchIndex[qid] || "";
     const isWrong = isLastWrong(qid);
+    const isAnswered = hasAnyAttempt(qid);
     if (isWrong) wrongCount += 1;
     const visibleBySearch = !query || searchable.includes(query);
     const visibleByWrong = !state.wrongOnly || isWrong;
-    const visible = visibleBySearch && visibleByWrong;
+    const visibleByBlock = !state.filters.block || card.dataset.block === state.filters.block;
+    const visibleBySection = !state.filters.section || card.dataset.section === state.filters.section;
+    const visibleByType = !state.filters.type || card.dataset.type === state.filters.type;
+    const visibleByUnanswered = !state.filters.unanswered || !isAnswered;
+    const visible = visibleBySearch && visibleByWrong && visibleByBlock && visibleBySection && visibleByType && visibleByUnanswered;
     card.classList.toggle("hide", !visible);
     if (visible) visibleCount += 1;
   }
@@ -515,13 +775,16 @@ function applyAllSearch() {
     block.classList.toggle("hide", !hasVisible);
   }
 
+  const emptyState = document.getElementById("all-empty-state");
+  if (emptyState) emptyState.classList.toggle("hide", visibleCount > 0);
+
   const total = state.questions.length;
   if (state.wrongOnly) {
     el.allSearchCount.textContent = query
       ? `Ошибки: ${visibleCount} / ${wrongCount}`
       : `Ошибок для повторения: ${wrongCount}`;
   } else {
-    el.allSearchCount.textContent = query ? `Найдено: ${visibleCount} / ${total}` : `Показаны все: ${total}`;
+    el.allSearchCount.textContent = hasActiveAllFilters() || query ? `Показано: ${visibleCount} / ${total}` : `Показаны все: ${total}`;
   }
 }
 
@@ -533,6 +796,40 @@ function updateWrongOnlyButton() {
 function isLastWrong(qid) {
   const item = state.stats.questions[String(qid)];
   return Boolean(item && item.lastCorrect === false);
+}
+
+function hasAnyAttempt(qid) {
+  const item = state.stats.questions[String(qid)];
+  return Boolean(item && item.attempts > 0);
+}
+
+function hasActiveAllFilters() {
+  return Boolean(state.filters.block || state.filters.section || state.filters.type || state.filters.unanswered || state.wrongOnly);
+}
+
+function handleWeakListClick(event) {
+  const button = event.target.closest("button[data-jump-id]");
+  if (!button) return;
+
+  const id = button.dataset.jumpId;
+  if (state.mode !== "all") startSession("all");
+
+  state.wrongOnly = false;
+  state.searchQuery = id;
+  state.filters = { block: "", section: "", type: "", unanswered: false };
+  syncFilterControls();
+  updateWrongOnlyButton();
+  el.allSearchInput.value = id;
+  applyAllSearch();
+
+  requestAnimationFrame(() => {
+    const card = document.getElementById(`all-q-${id}`);
+    if (!card) return;
+    card.closest("details")?.setAttribute("open", "");
+    card.scrollIntoView({ behavior: "smooth", block: "start" });
+    card.classList.add("pulse");
+    window.setTimeout(() => card.classList.remove("pulse"), 1200);
+  });
 }
 
 function evaluateAnswer(q, userRaw) {
@@ -666,7 +963,48 @@ function renderStats() {
   el.statBestStreak.textContent = String(s.bestStreak);
 
   renderStatsTable();
+  renderBlockProgress();
   renderWeakList();
+}
+
+function renderBlockProgress() {
+  const rows = state.blockOrder.map((block) => {
+    const questions = state.questions.filter((q) => q.block === block);
+    const total = questions.length;
+    let covered = 0;
+    let correct = 0;
+    let wrong = 0;
+
+    for (const q of questions) {
+      const item = state.stats.questions[String(q.id)];
+      if (!item || item.attempts === 0) continue;
+      covered += 1;
+      correct += item.correct;
+      wrong += item.wrong;
+    }
+
+    const progress = total ? Math.round((covered / total) * 100) : 0;
+    const accuracy = correct + wrong ? Math.round((correct / (correct + wrong)) * 100) : 0;
+    return { block, total, covered, correct, wrong, progress, accuracy };
+  });
+
+  el.blockProgressList.innerHTML = rows
+    .map((row) => `
+      <div class="progress-row">
+        <div class="progress-row-head">
+          <span>${escapeHtml(row.block)}</span>
+          <b>${row.covered}/${row.total}</b>
+        </div>
+        <div class="progress-track">
+          <span style="width: ${row.progress}%"></span>
+        </div>
+        <div class="progress-row-foot">
+          <span>Точность ${row.accuracy}%</span>
+          <span>Ошибок ${row.wrong}</span>
+        </div>
+      </div>
+    `)
+    .join("");
 }
 
 function renderStatsTable() {
@@ -708,6 +1046,7 @@ function renderStatsTable() {
   el.statsTableBody.innerHTML = orderedRows
     .map((r) => {
       const answeredStatus = r.correct > 0 ? "Да" : "Нет";
+      const statusClass = r.correct > 0 ? "good" : r.wrong > 0 ? "bad" : "neutral";
       const accuracyPct = r.attempts ? Math.round((r.correct / r.attempts) * 100) : 0;
       const masteryPct = r.total ? Math.round((r.correct / r.total) * 100) : 0;
       return `
@@ -716,7 +1055,7 @@ function renderStatsTable() {
           <td>${escapeHtml(r.section)}</td>
           <td>${r.correct}</td>
           <td>${r.wrong}</td>
-          <td>${answeredStatus}</td>
+          <td><span class="status-pill ${statusClass}">${answeredStatus}</span></td>
           <td>${accuracyPct}%</td>
           <td>${masteryPct}%</td>
           <td>${r.covered}/${r.total}</td>
@@ -742,9 +1081,26 @@ function renderWeakList() {
     .map((item) => {
       const q = state.questions.find((x) => String(x.id) === item.id);
       const title = q ? q.question.slice(0, 110) : `Вопрос ${item.id}`;
-      return `<li><b>ID ${item.id}</b> (${Math.round(item.rate * 100)}%, ошибок: ${item.wrong}) - ${escapeHtml(title)}</li>`;
+      const number = q ? questionNumber(q) : item.id;
+      return `
+        <li>
+          <div>
+            <b>Вопрос №${escapeHtml(number)}</b>
+            <span>${Math.round(item.rate * 100)}%, ошибок: ${item.wrong}</span>
+            <p>${escapeHtml(title)}</p>
+          </div>
+          <button class="btn ghost small weak-jump" data-jump-id="${item.id}">Открыть</button>
+        </li>
+      `;
     })
     .join("");
+}
+
+function registerServiceWorker() {
+  if (!("serviceWorker" in navigator)) return;
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js").catch(() => {});
+  });
 }
 
 function loadStats() {
@@ -785,6 +1141,10 @@ function createEmptyStats() {
     bestStreak: 0,
     questions: {},
   };
+}
+
+function questionNumber(q) {
+  return q?.sourceNumber || q?.wordNumber || q?.docNumber || q?.id || "-";
 }
 
 function shuffle(arr) {
