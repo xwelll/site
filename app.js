@@ -411,6 +411,10 @@ function renderTextInput(q, scope) {
 function renderMatchingInput(q, scope) {
   const model = buildMatchingModel(q);
   if (model.kind === "matching" && model.left.length && model.right.length) {
+    if (hasMultiMatchAnswer(q.correctAnswer) || model.right.length > model.left.length) {
+      return renderMultiMatchingInput(model, scope);
+    }
+
     return `
       <div class="match-layout">
         <div class="match-bank">
@@ -467,6 +471,36 @@ function renderMatchingInput(q, scope) {
   return renderTextInput(q, scope);
 }
 
+function renderMultiMatchingInput(model, scope) {
+  return `
+    <div class="match-layout">
+      <div class="match-bank">
+        ${model.right.map((item) => `
+          <div class="match-bank-item">
+            <b>${escapeHtml(item.label)})</b>
+            <span>${escapeHtml(item.text)}</span>
+          </div>
+        `).join("")}
+      </div>
+      <div class="match-rows">
+        ${model.left.map((item) => `
+          <div class="match-row multi">
+            <span class="match-left"><b>${escapeHtml(item.label)}.</b> ${escapeHtml(item.text)}</span>
+            <div class="match-checks">
+              ${model.right.map((right) => `
+                <label class="match-choice">
+                  <input type="checkbox" data-match-checkbox="${scope}" data-match-left="${escapeHtml(item.label)}" value="${escapeHtml(right.label)}">
+                  <span>${escapeHtml(right.label)}</span>
+                </label>
+              `).join("")}
+            </div>
+          </div>
+        `).join("")}
+      </div>
+    </div>
+  `;
+}
+
 function buildMatchingModel(q) {
   const model = {
     kind: "sequence",
@@ -520,7 +554,34 @@ function cleanOptionText(value) {
   return String(value || "").replace(/[;,.]\s*$/u, "").trim();
 }
 
+function hasMultiMatchAnswer(value) {
+  return normalizePairAnswer(value)
+    .split(";")
+    .some((part) => (part.split("-")[1] || "").split(",").filter(Boolean).length > 1);
+}
+
 function getMatchingAnswer(container, scope) {
+  const checkboxes = [...container.querySelectorAll(`input[data-match-checkbox="${scope}"]`)];
+  if (checkboxes.length) {
+    const byLeft = new Map();
+    const selectedValues = [];
+    for (const checkbox of checkboxes) {
+      if (!byLeft.has(checkbox.dataset.matchLeft)) byLeft.set(checkbox.dataset.matchLeft, []);
+      if (checkbox.checked) {
+        byLeft.get(checkbox.dataset.matchLeft).push(checkbox.value);
+        selectedValues.push(checkbox.value);
+      }
+    }
+
+    if ([...byLeft.values()].some((values) => values.length === 0)) return "";
+    if (new Set(selectedValues).size !== selectedValues.length) return "";
+
+    return [...byLeft.entries()]
+      .sort((a, b) => Number(a[0]) - Number(b[0]))
+      .map(([left, values]) => `${left}-${values.join(",")}`)
+      .join(" ");
+  }
+
   const pairSelects = [...container.querySelectorAll(`select[data-match-select="${scope}"]`)];
   if (pairSelects.length) {
     const values = pairSelects.map((select) => select.value);
@@ -533,7 +594,6 @@ function getMatchingAnswer(container, scope) {
   if (sequenceSelects.length) {
     const values = sequenceSelects.map((select) => select.value);
     if (values.some((value) => !value)) return "";
-    if (new Set(values).size !== values.length) return "";
     return values.join(", ");
   }
 
@@ -541,6 +601,12 @@ function getMatchingAnswer(container, scope) {
 }
 
 function handleMatchingSelectChange(event) {
+  const checkbox = event.target.closest("input[data-match-checkbox]");
+  if (checkbox) {
+    updateMatchingCheckboxes(checkbox);
+    return;
+  }
+
   const select = event.target.closest("select[data-match-select], select[data-sequence-select]");
   if (!select) return;
 
@@ -550,6 +616,8 @@ function handleMatchingSelectChange(event) {
   const selector = select.matches("[data-match-select]")
     ? "select[data-match-select]"
     : "select[data-sequence-select]";
+  if (selector === "select[data-sequence-select]") return;
+
   const selects = [...rows.querySelectorAll(selector)];
   const selected = new Set(selects.map((item) => item.value).filter(Boolean));
 
@@ -558,6 +626,22 @@ function handleMatchingSelectChange(event) {
       if (!option.value) continue;
       option.disabled = item.value !== option.value && selected.has(option.value);
     }
+  }
+}
+
+function updateMatchingCheckboxes(changed) {
+  const layout = changed.closest(".match-layout");
+  if (!layout) return;
+
+  const checkboxes = [...layout.querySelectorAll("input[data-match-checkbox]")];
+  const selectedByValue = new Map();
+  for (const checkbox of checkboxes) {
+    if (checkbox.checked) selectedByValue.set(checkbox.value, checkbox.dataset.matchLeft);
+  }
+
+  for (const checkbox of checkboxes) {
+    const selectedLeft = selectedByValue.get(checkbox.value);
+    checkbox.disabled = Boolean(selectedLeft && selectedLeft !== checkbox.dataset.matchLeft);
   }
 }
 
@@ -854,13 +938,39 @@ function evaluateAnswer(q, userRaw) {
 }
 
 function normalizePairAnswer(value) {
-  const text = normalizeLetters(value);
-  const matches = [...text.matchAll(/(\d+)\s*[-=:.]?\s*([A-ZА-Я])/g)];
-  if (!matches.length) return "";
-  return matches
-    .map((m) => `${Number(m[1])}-${normalizeLetter(m[2])}`)
-    .sort((a, b) => Number(a.split("-")[0]) - Number(b.split("-")[0]))
-    .join(",");
+  const text = normalizeLetters(value)
+    .replace(/[–—_]/g, "-")
+    .replace(/[|;]/g, ",")
+    .replace(/\s+/g, " ")
+    .trim();
+  const groups = new Map();
+
+  for (const match of text.matchAll(/(\d+)\s*-\s*([A-ZА-Я](?:\s*,\s*[A-ZА-Я])*)/g)) {
+    const left = String(Number(match[1]));
+    const letters = match[2]
+      .split(",")
+      .map((letter) => normalizeLetter(letter.trim()))
+      .filter(Boolean);
+    if (!groups.has(left)) groups.set(left, []);
+    groups.get(left).push(...letters);
+  }
+
+  for (const match of text.matchAll(/([A-ZА-Я])\s*-\s*(\d+)/g)) {
+    const left = String(Number(match[2]));
+    const letter = normalizeLetter(match[1]);
+    if (!groups.has(left)) groups.set(left, []);
+    groups.get(left).push(letter);
+  }
+
+  if (!groups.size) return "";
+
+  return [...groups.entries()]
+    .sort((a, b) => Number(a[0]) - Number(b[0]))
+    .map(([left, letters]) => {
+      const unique = [...new Set(letters)].sort((a, b) => a.localeCompare(b, "ru"));
+      return `${left}-${unique.join(",")}`;
+    })
+    .join(";");
 }
 
 function normalizeLetterSequence(value) {

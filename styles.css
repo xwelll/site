@@ -308,6 +308,10 @@ body {
   grid-template-columns: minmax(0, 1fr) 160px;
 }
 
+.match-row.multi {
+  grid-template-columns: minmax(0, 1fr);
+}
+
 .match-left {
   line-height: 1.35;
 }
@@ -325,6 +329,35 @@ body {
   background: #fff;
   font: 800 15px/1 "Rubik", sans-serif;
   color: var(--ink);
+}
+
+.match-checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.match-choice {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #d3d9e2;
+  border-radius: 999px;
+  background: #fff;
+  padding: 8px 10px;
+  cursor: pointer;
+  font: 800 13px/1 "Rubik", sans-serif;
+}
+
+.match-choice:has(input:checked) {
+  border-color: var(--brand);
+  background: #eef6ff;
+  color: #06449c;
+}
+
+.match-choice:has(input:disabled:not(:checked)) {
+  opacity: 0.45;
+  cursor: not-allowed;
 }
 
 textarea {
