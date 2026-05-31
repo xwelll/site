@@ -3,26 +3,39 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#0f6bff">
+  <meta name="theme-color" content="#ed1741">
   <title>Тренажер экзамена</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;800&family=IBM+Plex+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&family=Roboto+Slab:wght@700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <main class="page">
     <section class="hero">
-      <p class="kicker">Подготовка к ГИА</p>
-      <h1>Единый тренажер по билетам и всем вопросам</h1>
-      <p class="subtitle">
-        Два режима: все вопросы в перемешку с учетом блоков и разделов, либо билет из 15 вопросов (1 вопрос на каждый блок+раздел).
-      </p>
+      <div class="portal-head">
+        <div class="portal-brand">
+          <span class="portal-brand-mark">‹</span>
+          <span class="portal-brand-main"><b>SYNERGY</b><small>LEARNING SYSTEM</small></span>
+          <span class="portal-brand-divider"></span>
+          <span class="portal-brand-career">ОБРАЗОВАНИЕ<br>ДЛЯ КАРЬЕРЫ</span>
+        </div>
+        <div class="portal-profile">
+          <span class="portal-profile-icon">С</span>
+          <span><b>Подготовка к ГИА</b><small>Экзаменационный тренажер</small></span>
+        </div>
+      </div>
+      <p class="hero-greeting">Добрый день!</p>
+      <div class="hero-banner">
+        <span class="hero-banner-icon">✓</span>
+        <span><b>Подготовьтесь к экзамену уверенно</b><small>Вопросы, билеты и подробная статистика в одном месте</small></span>
+      </div>
     </section>
 
     <section class="topbar">
       <div class="tabs" aria-label="Режим тренировки">
+        <span class="nav-title">Обучение</span>
         <button id="tab-all" class="tab active">Все вопросы</button>
         <button id="tab-ticket" class="tab">Билет 15</button>
       </div>
