@@ -866,6 +866,412 @@ th {
   }
 }
 
+/* Closer reproduction of the Synergy learning cabinet */
+.portal-head {
+  min-height: 54px;
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.portal-user-area {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.portal-accessibility {
+  color: #07509a;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.portal-eye {
+  color: #222;
+  font-size: 9px;
+}
+
+.portal-profile {
+  min-width: 208px;
+  padding: 5px 8px;
+}
+
+.portal-profile-arrow {
+  margin-left: auto;
+  color: var(--brand);
+}
+
+.portal-quick-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 7px;
+  min-height: 34px;
+  padding-top: 4px;
+}
+
+.portal-quick {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 29px;
+  padding: 0 12px;
+  border-radius: 3px;
+  color: #a56200;
+  background: #ffc32d;
+  font-size: 12px;
+}
+
+.portal-quick b {
+  position: absolute;
+  top: -11px;
+  right: -10px;
+  border-radius: 9px;
+  padding: 1px 5px;
+  color: #fff;
+  background: var(--brand);
+  font-size: 11px;
+}
+
+.portal-quick-small {
+  min-width: 54px;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.hero-greeting {
+  margin: -24px 0 10px;
+}
+
+.hero-banner {
+  min-height: 55px;
+  border-radius: 10px;
+  padding: 8px 20px;
+  background:
+    linear-gradient(106deg, rgba(151, 35, 53, 0.98) 0%, rgba(182, 45, 65, 0.98) 60%, rgba(255, 255, 255, 0.92) 60%, rgba(255, 255, 255, 0.98) 100%),
+    repeating-linear-gradient(25deg, transparent 0 26px, rgba(237, 23, 65, 0.45) 27px 34px);
+}
+
+.hero-banner-icon {
+  color: #fff;
+  font-size: 28px;
+}
+
+.hero-banner b {
+  font-size: 20px;
+  font-weight: 400;
+}
+
+.portal-main-nav {
+  display: flex;
+  margin-top: 20px;
+  border-radius: 3px;
+  overflow: hidden;
+  color: #fff;
+  background: var(--brand);
+}
+
+.portal-main-nav span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 50px;
+  padding: 0 14px;
+  font-size: 17px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.portal-main-nav .active {
+  background: var(--navy);
+}
+
+.portal-breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+  margin-top: 14px;
+  color: #8c9298;
+  font-size: 11px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.portal-breadcrumbs b {
+  overflow: hidden;
+  color: #202938;
+  font-weight: 400;
+  text-overflow: ellipsis;
+}
+
+.portal-curator {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  min-height: 134px;
+  padding: 13px 14px 8px;
+}
+
+.portal-curator-main,
+.portal-role {
+  display: flex;
+  gap: 14px;
+}
+
+.portal-curator-avatar {
+  display: grid;
+  width: 58px;
+  height: 58px;
+  place-items: center;
+  color: #d9d9d9;
+  background:
+    radial-gradient(circle at 50% 30%, #ededed 0 12px, transparent 13px),
+    radial-gradient(ellipse at 50% 95%, #e1e1e1 0 24px, transparent 25px);
+  font-size: 0;
+}
+
+.portal-curator-lines {
+  display: grid;
+  align-content: start;
+  gap: 4px;
+  color: #1c1f24;
+}
+
+.portal-curator-lines b {
+  font-size: 12px;
+}
+
+.portal-curator-lines i {
+  display: inline-grid;
+  width: 15px;
+  height: 15px;
+  place-items: center;
+  border: 1px solid #07509a;
+  border-radius: 50%;
+  color: #07509a;
+  font-size: 10px;
+  font-style: normal;
+}
+
+.portal-curator-lines small,
+.portal-role small {
+  font-size: 11px;
+}
+
+.portal-curator a,
+.portal-role a {
+  color: #07509a;
+  font-size: 11px;
+  text-decoration: none;
+}
+
+.portal-role {
+  align-items: center;
+  min-width: 260px;
+  padding-right: 6px;
+}
+
+.portal-role span {
+  margin-left: auto;
+  color: #8c9298;
+}
+
+.portal-course-title {
+  margin: 0 0 30px;
+  color: var(--brand);
+  font: 400 29px/1.25 "Open Sans", sans-serif;
+  overflow-wrap: anywhere;
+}
+
+.portal-resource {
+  display: grid;
+  min-height: 106px;
+  align-content: center;
+  margin-bottom: 30px;
+  padding: 20px 35px;
+  border: 1px solid #ececec;
+  border-radius: 4px;
+  background: #fff;
+}
+
+.portal-resource small {
+  color: #394150;
+  font-size: 11px;
+}
+
+.portal-resource b {
+  color: #064081;
+  font-size: 13px;
+}
+
+.portal-materials-head,
+.portal-material-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 0;
+}
+
+.portal-materials-head h2 {
+  margin: 0 0 14px;
+  color: #064081;
+  font-size: 26px;
+  font-weight: 400;
+}
+
+.portal-materials-head span {
+  color: #1e1e1e;
+  font-size: 14px;
+}
+
+.portal-materials-head b {
+  display: inline-block;
+  min-width: 86px;
+  margin-left: 8px;
+  border-radius: 10px;
+  color: #222;
+  background: linear-gradient(#ffc33b, #ff9900);
+  text-align: center;
+  font-size: 9px;
+}
+
+.portal-material-row {
+  min-height: 34px;
+  padding: 0 12px 8px 42px;
+  border-bottom: 1px solid #ddd;
+  color: #3c3f45;
+  font-size: 13px;
+}
+
+.portal-material-row span {
+  color: #18854a;
+  font-weight: 800;
+}
+
+.training-toolbar {
+  position: static;
+  display: flex;
+  margin-top: 16px;
+  border: 1px solid #ddd;
+  background: #fff;
+}
+
+.training-toolbar .tabs {
+  gap: 0;
+}
+
+.training-toolbar .nav-title,
+.training-toolbar .tab {
+  min-height: 46px;
+  color: #fff;
+  background: var(--brand);
+}
+
+.training-toolbar .tab.active {
+  background: var(--navy);
+}
+
+.training-toolbar .command-bar {
+  padding: 5px;
+}
+
+.training-toolbar .btn {
+  min-height: 35px;
+}
+
+@media (max-width: 1080px) {
+  .portal-main-nav {
+    overflow-x: auto;
+  }
+
+  .portal-main-nav span {
+    font-size: 15px;
+  }
+
+  .hero-greeting {
+    margin-top: 8px;
+  }
+}
+
+@media (max-width: 900px) {
+  .portal-user-area {
+    gap: 6px;
+  }
+
+  .portal-accessibility,
+  .portal-quick-row,
+  .portal-breadcrumbs,
+  .portal-curator,
+  .portal-material-row {
+    display: none;
+  }
+
+  .hero-greeting {
+    margin-top: 12px;
+  }
+
+  .hero-banner {
+    border-radius: 4px;
+    background: linear-gradient(106deg, #a7273b 0%, #b6293f 70%, #8e1f35 70%, #8e1f35 100%);
+  }
+
+  .portal-main-nav {
+    margin-top: 12px;
+  }
+
+  .portal-main-nav span {
+    min-height: 42px;
+    padding: 0 12px;
+    font-size: 13px;
+  }
+
+  .portal-course-title {
+    margin: 16px 0;
+    font-size: 20px;
+    word-break: break-word;
+  }
+
+  .portal-resource {
+    min-height: 78px;
+    margin-bottom: 16px;
+    padding: 14px;
+  }
+
+  .portal-materials-head h2 {
+    font-size: 22px;
+  }
+
+  .portal-materials-head {
+    display: grid;
+    gap: 5px;
+    margin-bottom: 12px;
+  }
+
+  .portal-materials-head span {
+    font-size: 11px;
+  }
+
+  .training-toolbar {
+    display: block;
+  }
+
+  .training-toolbar .btn {
+    width: 100%;
+    min-width: 0;
+    padding-right: 5px;
+    padding-left: 5px;
+    font-size: 11px;
+  }
+
+  .portal-main-nav,
+  .training-toolbar,
+  .portal-course-title {
+    max-width: 100%;
+  }
+
+  body {
+    overflow-x: hidden;
+  }
+}
+
 /* Synergy portal-inspired theme */
 :root {
   --bg: #f4f4f2;
