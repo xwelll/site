@@ -12,64 +12,84 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <svg class="svg-sprite" aria-hidden="true">
+    <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.5-5 10-5 10 5 10 5-3.5 5-10 5S2 12 2 12Z"/><circle cx="12" cy="12" r="2.6"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 21c.4-4 2.7-6 7-6s6.6 2 7 6"/></symbol>
+    <symbol id="i-headset" viewBox="0 0 24 24"><path d="M4 14v-2a8 8 0 0 1 16 0v2"/><rect x="3" y="13" width="4" height="7" rx="1"/><rect x="17" y="13" width="4" height="7" rx="1"/><path d="M17 20c0 1.1-1.8 2-4 2"/></symbol>
+    <symbol id="i-megaphone" viewBox="0 0 24 24"><path d="m4 13 12-5v8L4 11v2Z"/><path d="M7 13v6h4l-1.7-5.1M19 9v6"/></symbol>
+    <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="1.5"/><path d="m4 7 8 6 8-6"/></symbol>
+    <symbol id="i-hand" viewBox="0 0 24 24"><path d="M8.5 12V5.5a1.5 1.5 0 0 1 3 0V11m0-5.5a1.5 1.5 0 0 1 3 0V11m0-4a1.5 1.5 0 0 1 3 0v5m0-2a1.5 1.5 0 0 1 3 0v4.2C20.5 19 17 22 12.8 22H12c-2.8 0-4.7-1.4-6.2-3.5l-2.3-3.1a1.7 1.7 0 0 1 2.7-2l2.3 2.1"/></symbol>
+    <symbol id="i-news" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="1"/><path d="M8 8h3v3H8zM14 8h3M14 11h3M8 14h9M8 17h9"/></symbol>
+    <symbol id="i-cap" viewBox="0 0 24 24"><path d="m3 10 9-5 9 5-9 5-9-5Z"/><path d="M7 13v4c3 2 7 2 10 0v-4M21 10v6"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-card" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="1.5"/><path d="M3 10h18M7 15h4"/></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v5h5M9 12h6M9 16h6"/></symbol>
+    <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 5c3-1 5-.7 8 1v14c-3-1.7-5-2-8-1zm16 0c-3-1-5-.7-8 1v14c3-1.7 5-2 8-1z"/></symbol>
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="m4 11 8-7 8 7v9H4z"/><path d="M9 20v-6h6v6"/></symbol>
+    <symbol id="i-grid" viewBox="0 0 24 24"><path d="M5 5h4v4H5zm10 0h4v4h-4zM5 15h4v4H5zm10 0h4v4h-4z"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m8 9 4 4 4-4"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7h.01"/></symbol>
+  </svg>
   <main class="page">
     <section class="hero">
       <div class="portal-head">
         <div class="portal-brand">
-          <span class="portal-brand-mark">‹</span>
+          <span class="portal-brand-mark"><b>‹</b></span>
           <span class="portal-brand-main"><b>SYNERGY</b><small>LEARNING SYSTEM</small></span>
           <span class="portal-brand-divider"></span>
           <span class="portal-brand-career">ОБРАЗОВАНИЕ<br>ДЛЯ КАРЬЕРЫ</span>
         </div>
         <div class="portal-user-area">
-          <div class="portal-accessibility">Версия для слабовидящих <span class="portal-eye">●</span> <u>Ру</u>⌄</div>
+          <div class="portal-accessibility">Версия для слабовидящих <svg class="icon"><use href="#i-eye"/></svg> <u>Ру</u><svg class="icon icon-chevron"><use href="#i-chevron"/></svg></div>
           <div class="portal-profile">
-            <span class="portal-profile-icon">С</span>
+            <span class="portal-profile-icon"><svg class="icon"><use href="#i-user"/></svg></span>
             <span><b>Чухарев Кирилл</b><small>Борисович</small></span>
-            <span class="portal-profile-arrow">⌄</span>
+            <span class="portal-profile-arrow"><svg class="icon icon-chevron"><use href="#i-chevron"/></svg></span>
           </div>
         </div>
       </div>
-      <div class="portal-quick-row">
-        <span class="portal-quick">Студенческая жизнь <b>389</b></span>
-        <span class="portal-quick">Обратиться в деканат</span>
-        <span class="portal-quick portal-quick-small">70</span>
-        <span class="portal-quick portal-quick-small">1</span>
+      <div class="portal-welcome-row">
+        <p class="hero-greeting">Добрый день, Кирилл!</p>
+        <div class="portal-quick-row">
+          <span class="portal-quick">Студенческая жизнь <b>389</b></span>
+          <span class="portal-quick"><svg class="icon"><use href="#i-headset"/></svg>Обратиться в деканат</span>
+          <span class="portal-quick portal-quick-small"><svg class="icon"><use href="#i-megaphone"/></svg>70</span>
+          <span class="portal-quick portal-quick-small"><svg class="icon"><use href="#i-mail"/></svg>1</span>
+        </div>
       </div>
-      <p class="hero-greeting">Добрый день, Кирилл!</p>
       <div class="hero-banner">
-        <span class="hero-banner-icon">♧</span>
+        <span class="hero-banner-icon"><svg class="icon"><use href="#i-hand"/></svg></span>
         <span><b>Стань участником Synergy Friends и учись бесплатно!</b></span>
       </div>
       <nav class="portal-main-nav" aria-label="Основное меню">
-        <span>▦ Объявления</span>
-        <span class="active">◇ Обучение</span>
-        <span>◷ Расписание</span>
-        <span>▣ Платежи</span>
-        <span>▤ Документы</span>
-        <span>▥ Библиотека⌄</span>
+        <span><svg class="icon"><use href="#i-news"/></svg>Объявления</span>
+        <span class="active"><svg class="icon"><use href="#i-cap"/></svg>Обучение</span>
+        <span><svg class="icon"><use href="#i-clock"/></svg>Расписание</span>
+        <span><svg class="icon"><use href="#i-card"/></svg>Платежи</span>
+        <span><svg class="icon"><use href="#i-file"/></svg>Документы</span>
+        <span><svg class="icon"><use href="#i-book"/></svg>Библиотека <svg class="icon icon-chevron"><use href="#i-chevron"/></svg></span>
       </nav>
       <div class="portal-breadcrumbs">
-        <span>⌂</span><span>›</span><span>Учебный план</span><span>›</span>
+        <svg class="icon"><use href="#i-home"/></svg><span>›</span><span>Учебный план</span><span>›</span>
         <span>Подготовка к сдаче и сдача государственного экзамена</span><span>›</span>
         <b>Подготовка к сдаче и сдача государственного экзамена.(о)ДБИ-401рсоб</b>
       </div>
       <div class="portal-curator">
         <div class="portal-curator-main">
-          <span class="portal-curator-avatar">●</span>
+          <span class="portal-curator-avatar"><svg class="icon"><use href="#i-user"/></svg></span>
           <span class="portal-curator-lines">
             <b>Персональный Куратор 1: <i>?</i></b>
             <small>Давтян Тиграну Тиграновна</small>
-            <small>+7 (495) 221-84-34, доб. 81-25</small>
-            <small>TDavtian@synergy.ru</small>
-            <small>График работы</small>
+            <small><svg class="icon"><use href="#i-headset"/></svg>+7 (495) 221-84-34, доб. 81-25</small>
+            <small><svg class="icon"><use href="#i-mail"/></svg>TDavtian@synergy.ru</small>
+            <small><svg class="icon"><use href="#i-clock"/></svg>График работы</small>
             <a href="#">Оценить</a>
           </span>
         </div>
         <div class="portal-role">
           <small>Текущая роль:</small>
           <a href="#">группа ВБИо-401рсоб</a>
-          <span>⌄</span>
+          <span><svg class="icon icon-chevron"><use href="#i-chevron"/></svg></span>
         </div>
       </div>
       <h1 class="portal-course-title">Подготовка к сдаче и сдача государственного<br>экзамена.<wbr>(о)ДБИ-401рсоб</h1>
@@ -89,7 +109,7 @@
 
     <section class="topbar training-toolbar">
       <div class="tabs" aria-label="Режим тренировки">
-        <span class="nav-title">Тренажер</span>
+        <span class="nav-title"><svg class="icon"><use href="#i-grid"/></svg>Тренажер</span>
         <button id="tab-all" class="tab active">Все вопросы</button>
         <button id="tab-ticket" class="tab">Билет 15</button>
       </div>

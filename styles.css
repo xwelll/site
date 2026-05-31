@@ -866,6 +866,277 @@ th {
   }
 }
 
+/* Final cabinet alignment and icon pass */
+.svg-sprite {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+.icon {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.icon-chevron {
+  width: 13px;
+  height: 13px;
+}
+
+.page {
+  max-width: 1000px;
+  padding: 16px 22px 32px;
+}
+
+.portal-head {
+  min-height: 42px;
+}
+
+.portal-brand-mark {
+  width: 30px;
+  height: 30px;
+}
+
+.portal-brand-mark b {
+  transform: translateY(-2px);
+  font-size: 30px;
+  line-height: 1;
+}
+
+.portal-brand-main b {
+  font-size: 20px;
+}
+
+.portal-brand-career {
+  font-size: 16px;
+}
+
+.portal-accessibility {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.portal-accessibility .icon {
+  width: 15px;
+  height: 15px;
+  color: #282828;
+}
+
+.portal-profile {
+  min-width: 208px;
+  min-height: 53px;
+}
+
+.portal-profile-icon {
+  border-radius: 0;
+  background: linear-gradient(#f8f8f8, #dedede);
+}
+
+.portal-profile-icon .icon {
+  width: 24px;
+  height: 24px;
+  color: #aaa;
+}
+
+.portal-welcome-row {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 42px;
+}
+
+.hero-greeting {
+  margin: 0 0 8px;
+}
+
+.portal-quick-row {
+  min-height: 34px;
+  padding-top: 4px;
+}
+
+.portal-quick {
+  gap: 6px;
+  padding: 0 10px;
+}
+
+.portal-quick .icon {
+  width: 17px;
+  height: 17px;
+  color: #f06d00;
+}
+
+.hero-banner {
+  position: relative;
+  min-height: 55px;
+  overflow: hidden;
+  padding: 8px 20px;
+  border-radius: 10px;
+  background: linear-gradient(104deg, #a4263b 0%, #b52d43 61%, #fff 61%, #fff 100%);
+}
+
+.hero-banner::after {
+  content: "SYNERGY   FRIENDS     SYNERGY   FRIENDS";
+  position: absolute;
+  right: -18px;
+  bottom: -15px;
+  width: 305px;
+  padding: 7px 8px 18px;
+  transform: rotate(18deg);
+  border-top: 5px solid #cf3144;
+  color: #111;
+  background: #fff;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  word-spacing: 8px;
+}
+
+.hero-banner-icon {
+  z-index: 1;
+  display: inline-flex;
+}
+
+.hero-banner-icon .icon {
+  width: 26px;
+  height: 26px;
+}
+
+.hero-banner span {
+  z-index: 1;
+}
+
+.portal-main-nav {
+  margin-top: 20px;
+}
+
+.portal-main-nav span {
+  gap: 8px;
+  min-height: 50px;
+  padding: 0 12px;
+  font-size: 16px;
+}
+
+.portal-main-nav .icon {
+  width: 17px;
+  height: 17px;
+}
+
+.portal-breadcrumbs {
+  margin-top: 13px;
+}
+
+.portal-breadcrumbs .icon {
+  width: 14px;
+  height: 14px;
+}
+
+.portal-curator {
+  min-height: 142px;
+  padding: 12px 12px 6px;
+}
+
+.portal-curator-avatar {
+  width: 58px;
+  height: 58px;
+}
+
+.portal-curator-avatar .icon {
+  width: 50px;
+  height: 50px;
+  color: #d0d0d0;
+  stroke-width: 1.1;
+}
+
+.portal-curator-lines {
+  gap: 3px;
+}
+
+.portal-curator-lines small {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.portal-curator-lines small .icon {
+  width: 15px;
+  height: 15px;
+  color: var(--brand);
+}
+
+.portal-role {
+  min-width: 265px;
+}
+
+.portal-course-title {
+  margin-bottom: 30px;
+  font-size: 28px;
+}
+
+.portal-resource {
+  min-height: 106px;
+  margin-bottom: 29px;
+}
+
+.portal-materials-head h2 {
+  margin-bottom: 13px;
+}
+
+.portal-material-row {
+  min-height: 34px;
+}
+
+.training-toolbar {
+  margin-top: 7px;
+}
+
+.training-toolbar .nav-title::before {
+  content: none;
+}
+
+.training-toolbar .nav-title {
+  gap: 8px;
+}
+
+.training-toolbar .nav-title .icon {
+  width: 16px;
+  height: 16px;
+}
+
+@media (max-width: 900px) {
+  .page {
+    padding: 10px;
+  }
+
+  .portal-welcome-row {
+    display: block;
+    min-height: 0;
+  }
+
+  .hero-banner::after {
+    display: none;
+  }
+
+  .portal-main-nav span {
+    min-height: 42px;
+    padding: 0 10px;
+    font-size: 12px;
+  }
+
+  .portal-main-nav .icon {
+    width: 14px;
+    height: 14px;
+  }
+}
+
 /* Closer reproduction of the Synergy learning cabinet */
 .portal-head {
   min-height: 54px;
@@ -1803,5 +2074,68 @@ th {
 
   .layout {
     grid-template-columns: 1fr;
+  }
+}
+
+/* Keep the cabinet proportions stable after the legacy theme rules above. */
+.page {
+  max-width: 1000px;
+}
+
+.portal-welcome-row {
+  min-height: 32px;
+}
+
+.hero-greeting {
+  margin: 0 0 8px;
+}
+
+.portal-quick-row {
+  min-height: 30px;
+  padding-top: 0;
+}
+
+.hero-banner {
+  background: linear-gradient(104deg, #a4263b 0%, #b52d43 61%, #fff 61%, #fff 100%);
+}
+
+.portal-main-nav span {
+  gap: 8px;
+}
+
+.training-toolbar .nav-title::before {
+  content: none;
+}
+
+@media (max-width: 900px) {
+  .page,
+  .hero,
+  .portal-head,
+  .portal-user-area {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .hero {
+    overflow: hidden;
+  }
+
+  .portal-profile {
+    width: 145px;
+    min-width: 0;
+  }
+
+  .portal-welcome-row {
+    min-height: 0;
+  }
+
+  .portal-course-title {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    word-break: break-all;
+  }
+
+  .hero-banner {
+    background: linear-gradient(106deg, #a7273b 0%, #b6293f 70%, #8e1f35 70%, #8e1f35 100%);
   }
 }
